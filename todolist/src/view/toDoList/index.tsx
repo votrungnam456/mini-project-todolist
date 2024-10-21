@@ -7,9 +7,14 @@ import {
   ListItem,
   Typography,
   Checkbox,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "../../../node_modules/@mui/material/index";
 import Header from "../../component/organisms/header/header";
 import { makeStyles } from "../../../node_modules/@mui/styles/index";
+import "./index.scss";
 
 const useStyles = makeStyles({
   input: {
@@ -45,6 +50,12 @@ function ToDoList() {
   const [isEdited, setIsEdited] = useState(false);
   const [editedId, setEditedId] = useState(null);
   const classes = useStyles();
+
+  const [todoItem, setTodoItem] = useState({
+    id: null,
+    title: "",
+    status: 0,
+  });
 
   const onChange = (e) => {
     setInputVal(e.target.value);
@@ -86,7 +97,9 @@ function ToDoList() {
     setTodos(newTodos);
     setIsEdited(true);
   };
-
+  const handleChange = (ev: any) => {
+    console.log(ev);
+  };
   return (
     <>
       <Header title="To do list"></Header>
@@ -98,6 +111,20 @@ function ToDoList() {
           value={inputVal}
           className={classes.input}
         />
+        <FormControl className={!isEdited ? "hidden" : ""}>
+          <InputLabel id="demo-simple-select-label">Age</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={todoItem.status}
+            label="Age"
+            onChange={handleChange}
+          >
+            <MenuItem value={0}>Chưa làm</MenuItem>
+            <MenuItem value={1}>Đang Làm</MenuItem>
+            <MenuItem value={2}>Đã xong</MenuItem>
+          </Select>
+        </FormControl>
         <Button
           size="large"
           variant={isEdited ? "outlined" : "contained"}
