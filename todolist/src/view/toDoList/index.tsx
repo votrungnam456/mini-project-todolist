@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useState} from "react";
 import {
   Container,
   TextField,
@@ -13,7 +13,7 @@ import {
   MenuItem,
 } from "../../../node_modules/@mui/material/index";
 import Header from "../../component/organisms/header/header";
-import { makeStyles } from "../../../node_modules/@mui/styles/index";
+import {makeStyles} from "../../../node_modules/@mui/styles/index";
 import "./index.scss";
 
 const useStyles = makeStyles({
@@ -45,32 +45,38 @@ const useStyles = makeStyles({
 });
 
 function ToDoList() {
-  const [inputVal, setInputVal] = useState("");
-  const [todos, setTodos] = useState([]);
+  const [todos, setTodos] = useState<any>([]);
   const [isEdited, setIsEdited] = useState(false);
   const [editedId, setEditedId] = useState(null);
   const classes = useStyles();
 
   const [todoItem, setTodoItem] = useState({
-    id: null,
     title: "",
     status: 0,
   });
 
   const onChange = (e) => {
-    setInputVal(e.target.value);
+    setTodoItem({
+      ...todoItem,
+      title: e.target.value,
+    })
   };
 
   const handleClick = () => {
+    console.log(todoItem)
+    const {title, status} = todoItem;
     if (!isEdited) {
       setTodos([
         ...todos,
-        { val: inputVal, isDone: false, id: new Date().getTime() },
+        {title, status, id: new Date().getTime()},
       ]);
     } else {
-      setTodos([...todos, { val: inputVal, isDone: false, id: editedId }]);
+      setTodos([...todos, {title, status, id: editedId}]);
     }
-    setInputVal("");
+    setTodoItem({
+      title: "",
+      status: 0,
+    })
     setIsEdited(false);
   };
 
@@ -93,12 +99,19 @@ function ToDoList() {
     const newTodos = todos.filter((todo) => todo.id !== id);
     const editVal = todos.find((todo) => todo.id === id);
     setEditedId(editVal.id);
-    setInputVal(editVal.val);
+    // setInputVal(editVal.val);
+    setTodoItem({
+      ...todoItem,
+      title: editVal.title
+    })
     setTodos(newTodos);
     setIsEdited(true);
   };
   const handleChange = (ev: any) => {
-    console.log(ev);
+    console.log(ev.target.value);
+    setTodoItem({
+      ...todoItem, status: ev.target.value
+    })
   };
   return (
     <>
@@ -108,48 +121,55 @@ function ToDoList() {
           variant="outlined"
           onChange={onChange}
           label="type your task"
-          value={inputVal}
+          value={todoItem.title}
           className={classes.input}
         />
-        <FormControl className={!isEdited ? "hidden" : ""}>
-          <InputLabel id="demo-simple-select-label">Age</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={todoItem.status}
-            label="Age"
-            onChange={handleChange}
-          >
-            <MenuItem value={0}>Chưa làm</MenuItem>
-            <MenuItem value={1}>Đang Làm</MenuItem>
-            <MenuItem value={2}>Đã xong</MenuItem>
-          </Select>
-        </FormControl>
+        <div className={!isEdited ? "hidden" : "inline"}>
+          <FormControl>
+            <InputLabel id="demo-simple-select-label">Status</InputLabel>
+            {todoItem.status}
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={todoItem.status}
+              label="Age"
+              onChange={handleChange}
+            >
+              <MenuItem value={0}>Chưa làm</MenuItem>
+              <MenuItem value={1}>Đang Làm</MenuItem>
+              <MenuItem value={2}>Đã xong</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
         <Button
           size="large"
           variant={isEdited ? "outlined" : "contained"}
           color="primary"
           onClick={handleClick}
           className={classes.addButton}
-          disabled={inputVal ? false : true}
+          disabled={todoItem.title ? false : true}
         >
           {isEdited ? "Edit Task" : "Add Task"}
         </Button>
         <List>
-          {todos.map((todo) => {
+          {todos.map((todo, index: number) => {
             return (
               <>
-                <ListItem divider="bool" className={classes.list}>
-                  <Checkbox
-                    onClick={() => handleDone(todo.id)}
-                    checked={todo.isDone}
-                  />
+                <ListItem className={classes.list} key={index}>
+                  {/*<Checkbox*/}
+                  {/*  onClick={() => handleDone(todo.id)}*/}
+                  {/*  checked={todo.isDone}*/}
+                  {/*/>*/}
                   <Typography
                     className={classes.text}
-                    style={{ color: todo.isDone ? "green" : "" }}
-                    key={todo.id}
                   >
-                    {todo.val}
+                    {todo.title}
+                  </Typography>
+                  <Typography
+                    className={classes.text}
+                    style={{color: todo.status === 0 ? "red" : ""}}
+                  >
+                    {todo.status === 0 ? 'Chưa làm' : todo.status === 1 ? 'Đang làm' : 'Đã làm'}
                   </Typography>
                   <Button
                     onClick={() => handleEdit(todo.id)}
